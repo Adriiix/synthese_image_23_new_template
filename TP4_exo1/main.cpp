@@ -12,8 +12,8 @@ int main()
 
     // shaders
     const p6::Shader shader = p6::load_shader(
-        "shaders/triangle.vs.glsl",
-        "shaders/triangle.fs.glsl"
+        "shaders/color2D.vs.glsl",
+        "shaders/color2D.fs.glsl"
     );
 
     // creation du vbo
@@ -53,8 +53,8 @@ int main()
     glBindVertexArray(vao);
 
     // activation des attributs de vertex
-    const GLuint VERTEX_ATTR_POSITION = 3;
-    const GLuint VERTEX_ATTR_COLOR    = 8;
+    const GLuint VERTEX_ATTR_POSITION = 0;
+    const GLuint VERTEX_ATTR_COLOR    = 1;
 
     glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
     glEnableVertexAttribArray(VERTEX_ATTR_COLOR);

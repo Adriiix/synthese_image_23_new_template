@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "glimac/default_shader.hpp"
 #include "glm/ext/scalar_constants.hpp"
 #include "glm/glm.hpp"
@@ -61,20 +62,34 @@ int main()
     // => Tableau d'indices : ce sont les indices des sommets à dessiner
     // On en a 6 afin de former deux triangles
     // Chaque indice correspond au sommet correspondant dans le VBO
-    uint32_t indices[3 * N];
 
-    for (size_t i = 0; i < 3 * N; i += 3;)
+    std::vector<uint32_t> indices;
+
+    for (size_t i = 1; i < N; i++)
     {
-        indices[i]     = 0;
-        indices[i + 1] = i + 1;
-        indices[i + 2] = i + 2;
+        indices.push_back(0);
+        indices.push_back(i);
+        indices.push_back(i + 1);
     }
+    indices.push_back(0);
+    indices.push_back(N);
+    indices.push_back(1);
+
+    // => On remplit l'IBO avec les indices :
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * N * sizeof(uint32_t), indices.data(), GL_STATIC_DRAW);
+
+    // => Comme d'habitude on debind avant de passer à autre chose
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // CREATION DU VAO
     GLuint vao;
     glGenVertexArrays(1, &vao);
 
     glBindVertexArray(vao); // binder les vao
+
+    // => On bind l'IBO sur GL_ELEMENT_ARRAY_BUFFER; puisqu'un VAO est actuellement bindé,
+    // cela a pour effet d'enregistrer l'IBO dans le VAO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
     const GLuint VERTEX_ATTR_POSITION = 3;
     const GLuint VERTEX_ATTR_COLOR    = 8;
@@ -104,7 +119,9 @@ int main()
 
         shader.use();
 
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size()); // on dessine le triangle
+        // => On utilise glDrawElements à la place de glDrawArrays
+        // Cela indique à OpenGL qu'il doit utiliser l'IBO enregistré dans le VAO
+        glDrawElements(GL_TRIANGLES, 3 * N, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0); // debinder le vao
     };
