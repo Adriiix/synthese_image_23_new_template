@@ -70,6 +70,7 @@ int main()
     // Declare your infinite update loop.
 
     ctx.update = [&]() {
+        glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
         glBindVertexArray(vao);
         glimac::bind_default_shader();
