@@ -70,6 +70,7 @@ int main()
     glBindVertexArray(0);
 
     ctx.update = [&]() {
+        shader.use();
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -78,7 +79,6 @@ int main()
          *********************************/
 
         glBindVertexArray(vao);
-        shader.use();
 
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
