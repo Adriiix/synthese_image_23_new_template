@@ -1,5 +1,8 @@
 #include <vector>
 #include "glimac/default_shader.hpp"
+#include "glm/fwd.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "p6/p6.h"
 
 struct Vertex2DUV {
@@ -12,6 +15,33 @@ struct Vertex2DUV {
     }
 };
 
+glm::mat3 translate(float tx, float ty)
+{
+    return glm::mat3(
+        glm::vec3(1, 0, 0),
+        glm::vec3(0, 1, 0),
+        glm::vec3(tx, ty, 1)
+    );
+}
+
+glm::mat3 scale(float sx, float sy)
+{
+    return glm::mat3(
+        glm::vec3(sx, 0, 0),
+        glm::vec3(0, sy, 0),
+        glm::vec3(0, 0, 1)
+    );
+}
+
+glm::mat3 rotate(float a)
+{
+    return glm::mat3(
+        glm::vec3(cos(glm::radians(a)), sin(glm::radians(a)), 0),
+        glm::vec3(-sin(glm::radians(a)), cos(glm::radians(a)), 0),
+        glm::vec3(0, 0, 1)
+    );
+}
+
 int main()
 {
     auto ctx = p6::Context{{1280, 720, "TP4 EX4"}};
@@ -23,7 +53,7 @@ int main()
         "shaders/tex2D.fs.glsl"
     );
 
-    GLuint UTIME = glGetUniformLocation(shader.id(), "uTime");
+    GLuint UMODELMATRIX = glGetUniformLocation(shader.id(), "uModelMatrix");
 
     // création des 3 sommets
     Vertex2DUV P1 = Vertex2DUV(glm::vec2(-1.f, -1.f), glm::vec2(0, 0));
@@ -71,14 +101,14 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    float rotation = 0;
+    float a;
 
     ctx.update = [&]() {
         shader.use();
+        a += 0.1;
+        glm::mat3 matRot = rotate(a);
 
-        rotation += 0.1;
-
-        glUniform1f(UTIME, rotation);
+        glUniformMatrix3fv(UMODELMATRIX, 1, GL_FALSE, glm::value_ptr(matRot));
 
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
