@@ -23,6 +23,8 @@ int main()
         "shaders/tex2D.fs.glsl"
     );
 
+    GLuint UTIME = glGetUniformLocation(shader.id(), "uTime");
+
     // création des 3 sommets
     Vertex2DUV P1 = Vertex2DUV(glm::vec2(-1.f, -1.f), glm::vec2(0, 0));
     Vertex2DUV P2 = Vertex2DUV(glm::vec2(1.f, -1.f), glm::vec2(0, 0));
@@ -69,8 +71,15 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    float rotation = 0;
+
     ctx.update = [&]() {
         shader.use();
+
+        rotation += 0.1;
+
+        glUniform1f(UTIME, rotation);
+
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
 
