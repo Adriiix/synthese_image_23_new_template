@@ -105,21 +105,25 @@ int main()
 
     ctx.update = [&]() {
         shader.use();
+        glClearColor(0.f, 0.f, 0.f, 1.f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glBindVertexArray(vao);
+
         a += 0.1;
         glm::mat3 matRot = rotate(a);
 
-        glUniformMatrix3fv(UMODELMATRIX, 1, GL_FALSE, glm::value_ptr(matRot));
-
-        glClearColor(0.f, 0.f, 0.f, 1.f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        /*********************************GLsizei stride
-         * HERE SHOULD COME THE RENDERING CODE
-         *********************************/
-
-        glBindVertexArray(vao);
-
+        glUniformMatrix3fv(UMODELMATRIX, 1, GL_FALSE, glm::value_ptr(translate(-0.5, 0.5) * scale(0.25, 0.25) * matRot));
         glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glUniformMatrix3fv(UMODELMATRIX, 1, GL_FALSE, glm::value_ptr(translate(0.5, -0.5) * scale(0.25, 0.25) * matRot));
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glUniformMatrix3fv(UMODELMATRIX, 1, GL_FALSE, glm::value_ptr(translate(-0.5, -0.5) * scale(0.25, 0.25) * matRot));
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glUniformMatrix3fv(UMODELMATRIX, 1, GL_FALSE, glm::value_ptr(translate(0.5, 0.5) * scale(0.25, 0.25) * matRot));
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
         glBindVertexArray(0);
     };
 
