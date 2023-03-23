@@ -5,8 +5,9 @@ layout(location = 0) in vec2 aVertexPosition;
 layout(location = 1) in vec2 aVertexTexture;
 
 out vec2 vVertexPosition;
+out vec2 vVertexTexture;
 
-uniform mat3 uModelMatrix;
+//uniform mat3 uModelMatrix;
 
 mat3 rotate(float a){
   return mat3(
@@ -19,8 +20,9 @@ mat3 rotate(float a){
 void main()
 {
     vVertexPosition = aVertexPosition; // on sort la variable position
+    vVertexTexture = aVertexTexture; 
 
-    gl_Position = vec4((uModelMatrix*vec3(aVertexPosition,1.)).xy, 0., 1.); 
+    gl_Position = vec4(aVertexPosition, 0., 1.); 
 
 }
 

@@ -47,18 +47,38 @@ int main()
     auto ctx = p6::Context{{1280, 720, "TP4 EX4"}};
     ctx.maximize_window();
 
+    // load textures
+    img::Image texture = p6::load_image_buffer("assets/textures/triforce.png");
+
     // load shaders
     const p6::Shader shader = p6::load_shader(
         "shaders/tex2D.vs.glsl",
         "shaders/tex2D.fs.glsl"
     );
 
-    GLuint UMODELMATRIX = glGetUniformLocation(shader.id(), "uModelMatrix");
+    GLuint UTEXTURE = glGetUniformLocation(shader.id(), "uTexture");
+
+    // texture
+    GLuint textures;
+    glGenTextures(1, &textures);
+
+    // binder la texture
+    glBindTexture(GL_TEXTURE_2D, textures);
+
+    // envoi de l'image à la carte graphique
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.width(), texture.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.data());
+
+    // filtre linéaire
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // debinder la texture
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     // création des 3 sommets
     Vertex2DUV P1 = Vertex2DUV(glm::vec2(-1.f, -1.f), glm::vec2(0, 0));
-    Vertex2DUV P2 = Vertex2DUV(glm::vec2(1.f, -1.f), glm::vec2(0, 0));
-    Vertex2DUV P3 = Vertex2DUV(glm::vec2(0, 1.f), glm::vec2(0, 0));
+    Vertex2DUV P2 = Vertex2DUV(glm::vec2(1.f, -1.f), glm::vec2(1, 0));
+    Vertex2DUV P3 = Vertex2DUV(glm::vec2(0, 1.f), glm::vec2(0.5, 1));
 
     // création du vbo
     GLuint vbo;
@@ -101,29 +121,17 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    float a;
-
     ctx.update = [&]() {
         shader.use();
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
         glBindVertexArray(vao);
+        glBindTexture(GL_TEXTURE_2D, textures);
+        glUniform1i(UTEXTURE, 0);
 
-        a += 0.1;
-        glm::mat3 matRot = rotate(a);
-
-        glUniformMatrix3fv(UMODELMATRIX, 1, GL_FALSE, glm::value_ptr(translate(-0.5, 0.5) * scale(0.25, 0.25) * matRot));
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glUniformMatrix3fv(UMODELMATRIX, 1, GL_FALSE, glm::value_ptr(translate(0.5, -0.5) * scale(0.25, 0.25) * matRot));
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        glUniformMatrix3fv(UMODELMATRIX, 1, GL_FALSE, glm::value_ptr(translate(-0.5, -0.5) * scale(0.25, 0.25) * matRot));
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        glUniformMatrix3fv(UMODELMATRIX, 1, GL_FALSE, glm::value_ptr(translate(0.5, 0.5) * scale(0.25, 0.25) * matRot));
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
+        glBindTexture(GL_TEXTURE_2D, 0);
         glBindVertexArray(0);
     };
 
@@ -132,4 +140,5 @@ int main()
 
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
+    glDeleteTextures(0, &textures);
 }
